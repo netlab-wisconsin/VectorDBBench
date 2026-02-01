@@ -47,7 +47,8 @@ class ChromaClient(VectorDB):
     def init(self):
         self.client = chromadb.HttpClient(**self.db_config)
         self.collection = self.client.get_or_create_collection(
-            name=self.collection_name, configuration=self.case_config.index_param()
+            name=self.collection_name,
+            metadata=self.case_config.create_collection_metadata(),
         )
         yield
         self.client = None
@@ -59,7 +60,11 @@ class ChromaClient(VectorDB):
     def optimize(self, data_size: int | None = None):
         assert self.collection is not None, "Please call self.init() before"
         try:
-            self.collection.modify(configuration=self.case_config.search_param())
+            # self.collection.modify(configuration=self.case_config.search_param())
+            md = self.case_config.update_search_metadata()
+            if not md:
+                return
+            self.collection.modify(metadata=md)
         except Exception as e:
             log.warning(f"Optimize error: {e}")
             raise
@@ -87,7 +92,7 @@ class ChromaClient(VectorDB):
         assert self.client is not None, "Please call self.init() before"
         if filters:
             results = self.collection.query(
-                query_embeddings=[query], n_results=k, where={"id": {"$gt": filters.get("id")}}
+                query_embeddings=[query], n_results=k, where={"index": {"$gt": filters.get("id")}},
             )
         else:
             results = self.collection.query(query_embeddings=[query], n_results=k)

@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import redis
 from redis.commands.search.field import NumericField, TagField, VectorField
-from redis.commands.search.indexDefinition import IndexDefinition, IndexType
+from redis.commands.search.index_definition import IndexDefinition, IndexType
 from redis.commands.search.query import Query
 
 from ..api import DBCaseConfig, VectorDB

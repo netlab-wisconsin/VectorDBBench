@@ -38,17 +38,32 @@ class ChromaIndexConfig(ChromaConfig, DBCaseConfig):
             return "ip"
         if self.metric_type == MetricType.COSINE:
             return "cosine"
-        raise ValueError("Unsupported metric type: %s" % self.metric_type)
+        raise ValueError(f"Unsupported metric type: {self.metric_type}")
 
-    def index_param(self):
-        return {
-            "hnsw": {
-                "space": self.parse_metric(),
-                "max_neighbors": self.m,
-                "ef_construction": self.ef_construct,
-                "ef_search": self.search_param().get("ef_search", 100),
-            }
+    # ---- New helpers (metadata-based) ----
+    def create_collection_metadata(self) -> dict:
+        md: dict = {
+            "hnsw:space": self.parse_metric(),
+            "hnsw:M": int(self.m),
+            "hnsw:construction_ef": int(self.ef_construct),
         }
+        if self.ef_search is not None:
+            md["hnsw:search_ef"] = int(self.ef_search)
+        return md
+
+    def update_search_metadata(self) -> dict:
+        if self.ef_search is None:
+            return {}
+        return {"hnsw:search_ef": int(self.ef_search)}
+
+    # ---- Required by DBCaseConfig (abstract methods) ----
+    def index_param(self) -> dict:
+        """
+        Keep the old interface required by VectorDBBench (DBCaseConfig),
+        but we will NOT pass this dict to Chroma's `configuration=...`.
+        We'll pass it as metadata in ChromaClient.
+        """
+        return self.create_collection_metadata()
 
     def search_param(self) -> dict:
-        return {"ef_search": self.ef_search}
+        return self.update_search_metadata()

@@ -77,7 +77,7 @@ def PgVectoRSFlat(
         db=DB.PgVectoRS,
         db_config=PgVectoRSConfig(
             db_label=parameters["db_label"],
-            user_name=SecretStr(parameters["user_name"]),
+            user_name=parameters["user_name"],
             password=SecretStr(parameters["password"]),
             host=parameters["host"],
             db_name=parameters["db_name"],
@@ -105,7 +105,7 @@ def PgVectoRSIVFFlat(
         db=DB.PgVectoRS,
         db_config=PgVectoRSConfig(
             db_label=parameters["db_label"],
-            user_name=SecretStr(parameters["user_name"]),
+            user_name=parameters["user_name"],
             password=SecretStr(parameters["password"]),
             host=parameters["host"],
             db_name=parameters["db_name"],
@@ -135,7 +135,7 @@ def PgVectoRSHNSW(
         db=DB.PgVectoRS,
         db_config=PgVectoRSConfig(
             db_label=parameters["db_label"],
-            user_name=SecretStr(parameters["user_name"]),
+            user_name=parameters["user_name"],
             password=SecretStr(parameters["password"]),
             host=parameters["host"],
             db_name=parameters["db_name"],
